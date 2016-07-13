@@ -180,9 +180,10 @@ def select2(event):
     d.pack(side=LEFT, expand=True, fill=BOTH)
     W = 1
     dict = list(prolog.query("traslacion("+valor+",P)"))
-    print(dict[0]['P'])
-    W = (dict[0]['P'])
+    Rotacion = list(prolog.query("rotacion("+valor+",R)"))
 
+    W = (dict[0]['P'])
+    R = 0
     for var in prolog.query("planeta(Planeta,Clasificacion,Masa,Posicion)"):
         if var["Planeta"] == valor:
             if var["Planeta"] == "jupiter":
@@ -231,7 +232,12 @@ def select2(event):
             y = suny+sunr * np.sin(ang)
             coords = x,y
             while 1:
-                d.coords(imagesprite,coords)
+                #d.coords(imagesprite,coords)
+                d.delete(imagesprite)
+                R += 10 / Rotacion[0]['R']
+                image = ImageTk.PhotoImage(pilImage.rotate(R))
+                imagesprite = d.create_image(x, y, image=image)
+                #d.create_image(x,y,image=imagesprite)
                 d.update()
                 time.sleep(0.01)
                 delta = start - actual
@@ -241,6 +247,9 @@ def select2(event):
                 y = suny+ sunr*2 * np.sin(ang)
                 print(coords)
                 coords = x,y
+#
+#         Const -= 0.01
+#         C.update()
 
 
     #configuracion del canvas para incluir el scrollbar
