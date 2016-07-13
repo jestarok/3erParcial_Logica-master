@@ -4,6 +4,9 @@ from pyswip import *
 from Tkinter import *
 import Image
 from PIL import ImageTk
+import numpy as np
+import time
+
 master = Tk()
 master.minsize(500, 500)
 prolog = Prolog()
@@ -96,8 +99,9 @@ def dibujar(listaPlaneta):
                     var["Masa"] = 19
 
                 posab = posab + var["Posicion"]*k
-                y =180
-                d.create_circle(posab, 225,var["Masa"]*10, fill="blue", outline="#DDD", width=3)
+                y =255
+                d.create_circle(posab, y,var["Masa"]*10, fill="blue", outline="#DDD", width=3)
+                d.create_text(posab+var["Masa"]*5,y-15,text=plan)
                 posab = posab + var["Masa"]*7
                 #oval = d.create_oval(var["Posicion"]*k,var["Posicion"]+10,var["Masa"]*10,var["Masa"]+10,fill = "blue")
                 #labels = Label(dibujos, text=var["Planeta"])
@@ -171,57 +175,75 @@ def select2(event):
 
     #sol
     d.create_circle(sunx,suny,sunr, fill="yellow",outline="#DDD", width=3)
+    d.config(width=1000, height=700)
+    d.config(xscrollcommand=hbar.set, yscrollcommand=vbar.set)
+    d.pack(side=LEFT, expand=True, fill=BOTH)
+    W = 1
+    dict = list(prolog.query("traslacion("+valor+",P)"))
+    print(dict[0]['P'])
+    W = (dict[0]['P'])
 
     for var in prolog.query("planeta(Planeta,Clasificacion,Masa,Posicion)"):
         if var["Planeta"] == valor:
             if var["Planeta"] == "jupiter":
                 var["Masa"] = 13
-                photo = Image.open("C:\\Users\\Jesus\\Desktop\\3erParcial_Logica-master\\jupiter.png")
+                pilImage = Image.open("C:\\Users\\Jesus\\Desktop\\3erParcial_Logica-master\\jupiter.png")
+
 
             elif var["Planeta"] == "saturno":
                 var["Masa"] = 12
-                photo = Image.open("C:\\Users\\Jesus\\Desktop\\3erParcial_Logica-master\\saturno.png")
+                pilImage = Image.open("C:\\Users\\Jesus\\Desktop\\3erParcial_Logica-master\\saturn.png")
 
             elif var["Planeta"] == "neptuno":
                 var["Masa"] = 9
-                photo = Image.open("C:\\Users\\Jesus\\Desktop\\3erParcial_Logica-master\\neptuno.png")
+                pilImage = Image.open("C:\\Users\\Jesus\\Desktop\\3erParcial_Logica-master\\neptuno.png")
 
             elif var["Planeta"] == "urano" :
                 var["Masa"] = 8.5
-                photo = Image.open("C:\\Users\\Jesus\\Desktop\\3erParcial_Logica-master\\urano.png")
+                pilImage = Image.open("C:\\Users\\Jesus\\Desktop\\3erParcial_Logica-master\\urano.png")
 
             elif var["Planeta"] == "tierra" :
                 var["Masa"] = 4
-                photo = Image.open("C:\\Users\\Jesus\\Desktop\\3erParcial_Logica-master\\earth.png")
+                pilImage = Image.open("C:\\Users\\Jesus\\Desktop\\3erParcial_Logica-master\\earth.png")
 
             elif var["Planeta"] == "venus" :
                 var["Masa"] = 3
-                photo = Image.open("C:\\Users\\Jesus\\Desktop\\3erParcial_Logica-master\\venus.png")
+                pilImage = Image.open("C:\\Users\\Jesus\\Desktop\\3erParcial_Logica-master\\venus.png")
 
             elif var["Planeta"] == "marte" :
                 var["Masa"] = 2
-                photo = Image.open("C:\\Users\\Jesus\\Desktop\\3erParcial_Logica-master\\marte.png")
+                pilImage = Image.open("C:\\Users\\Jesus\\Desktop\\3erParcial_Logica-master\\marte.png")
 
             elif var["Planeta"] == "mercurio":
                 var["Masa"] = 1
-                photo = Image.open("C:\\Users\\Jesus\\Desktop\\3erParcial_Logica-master\\mercurio.png")
+                pilImage = Image.open("C:\\Users\\Jesus\\Desktop\\3erParcial_Logica-master\\mercurio.png")
 
-            #posicion y radio del planeta
-            planx = 2*sunx
-            plany = suny
-            planr = var["Masa"]*10
-            #creacion del planetapil
-            #img = PhotoImage(file="C:\\Users\\Jesus\\Desktop\\3erParcial_Logica-master\\earth.gif")
-            #d.create_circle(planx, plany,planr, fill="blue", outline="#DDD", width=3)
-            k+100
+            coords = 0,0
+            #pilImage = Image.open("earth.png")
+            image = ImageTk.PhotoImage(pilImage)
+            imagesprite = d.create_image(400,400,image=image)
+            actual = time.time()
+            start = time.time()
+            delta = 0
+            ang = 0
+            print(ang)
+            x = sunx+sunr * np.cos(ang)
+            y = suny+sunr * np.sin(ang)
+            coords = x,y
+            while 1:
+                d.coords(imagesprite,coords)
+                d.update()
+                time.sleep(0.01)
+                delta = start - actual
+                actual = time.time()
+                ang = (1/W) *delta
+                x = sunx+ sunr*2 * np.cos(ang)
+                y = suny+ sunr*2 * np.sin(ang)
+                print(coords)
+                coords = x,y
+
 
     #configuracion del canvas para incluir el scrollbar
-    d.config(width=1000, height=700)
-    d.config(xscrollcommand=hbar.set, yscrollcommand=vbar.set)
-    d.pack(side=LEFT, expand=True, fill=BOTH)
-    image = ImageTk.PhotoImage(photo)
-    imagesprite = d.create_image(planx,plany,image=image)
-    d.create_image(planx,plany,image = image)
 
 
 b1 = Button(master,text="Lunas de Planetas",command = lunasPlanetas)
